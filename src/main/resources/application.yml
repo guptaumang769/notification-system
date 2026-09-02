@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: notification-system
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/notifications}
+    username: ${DB_USER:notify}
+    password: ${DB_PASSWORD:notify}
+
+  jpa:
+    hibernate:
+      # Flyway owns the schema; Hibernate only validates the mapping against it.
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+server:
+  port: 8096
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      # Common tag stamped on every meter so a shared Prometheus can slice by application.
+      application: ${spring.application.name}
+    distribution:
+      # Emit histogram buckets for HTTP server timings so Grafana can compute p95/p99 latency.
+      percentiles-histogram:
+        http.server.requests: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+# --- Notification platform knobs -------------------------------------------------
+# Per-user rate cap (fixed window). Records RATE_LIMITED once exceeded.
+rate-limit:
+  max-per-window: ${RATE_LIMIT_MAX:5}
+  window-seconds: ${RATE_LIMIT_WINDOW_SECONDS:60}
+
+# How long a Redis idempotency claim is retained (DB unique constraint is the backstop).
+idempotency:
+  ttl-hours: ${IDEMPOTENCY_TTL_HOURS:24}
+
+# Mock channels simulate a transient failure with this probability, to exercise
+# retry + DLT. Default 0 keeps behaviour deterministic; try 0.3 to watch the DLT fill.
+channel:
+  transient-failure-rate: ${CHANNEL_TRANSIENT_FAILURE_RATE:0.0}
+
+# Poller that promotes due SCHEDULED notifications onto Kafka.
+scheduler:
+  poll:
+    fixed-delay-ms: ${SCHEDULER_POLL_DELAY_MS:5000}
