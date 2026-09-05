@@ -26,7 +26,7 @@ flowchart TB
     API -->|SETNX dedupe at edge| Redis[(Redis<br/>idempotency + rate limit)]
     API -->|publish 1 event per channel| Kafka["Kafka: notification·requests"]
 
-    Sched[ScheduledNotificationPoller<br/>@Scheduled] -->|promote due SCHEDULED| Kafka
+    Sched["ScheduledNotificationPoller<br/>@Scheduled"] -->|promote due SCHEDULED| Kafka
     API -->|future sendAt ⇒ SCHEDULED row| PG[(PostgreSQL<br/>Flyway-managed)]
 
     Kafka --> Consumer[NotificationConsumer]
