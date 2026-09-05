@@ -36,7 +36,7 @@ it's the **platform concerns** around reliable, deduplicated, rate-limited fan-o
 ```mermaid
 flowchart LR
     P[Producer / REST client] -->|POST /notifications| API[Ingestion API]
-    API -->|publish| K>Kafka notification-requests]
+    API -->|publish| K["Kafka: notification·requests"]
     API -.->|SETNX dedupe| R[(Redis)]
     K --> C[Notification consumer]
     C -->|render| T[TemplateService]
@@ -47,7 +47,7 @@ flowchart LR
     CF --> S[SmsSender → SNS]
     CF --> Pu[PushSender → FCM]
     C -->|status row| DB[(PostgreSQL)]
-    K -.retry exhausted.-> DLT>notification-requests.DLT]
+    K -.retry exhausted.-> DLT["notification·requests.DLT"]
     Sched[Scheduled poller] -->|due sends| K
 ```
 

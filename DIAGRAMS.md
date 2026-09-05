@@ -24,7 +24,7 @@ flowchart TB
 
     Client -->|POST /api/v1/notifications| API[NotificationController<br/>+ IngestionService]
     API -->|SETNX dedupe at edge| Redis[(Redis<br/>idempotency + rate limit)]
-    API -->|publish 1 event per channel| Kafka>Kafka notification-requests]
+    API -->|publish 1 event per channel| Kafka["Kafka: notification·requests"]
 
     Sched[ScheduledNotificationPoller<br/>@Scheduled] -->|promote due SCHEDULED| Kafka
     API -->|future sendAt ⇒ SCHEDULED row| PG[(PostgreSQL<br/>Flyway-managed)]
@@ -54,7 +54,7 @@ flowchart TB
     Rate -->|counter/TTL| Redis
     Idem -->|SETNX| Redis
 
-    Kafka -. retries exhausted .-> DLT>notification-requests.DLT]
+    Kafka -. retries exhausted .-> DLT["notification·requests.DLT"]
 
     Delivery -.metrics.-> Prom[(Prometheus)]
 ```
