@@ -77,8 +77,6 @@ public class KafkaConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "notification-service");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "com.umang.notification.event");
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, NotificationRequestedEvent.class.getName());
         JsonDeserializer<NotificationRequestedEvent> valueDeserializer =
                 new JsonDeserializer<>(NotificationRequestedEvent.class);
         valueDeserializer.addTrustedPackages("com.umang.notification.event");
